@@ -8,10 +8,10 @@
 #' @field betas Private.
 #' @section Methods:
 #' \describe{
-#'   \item{\code{new}}{Abstract class}
+#'   \item{\code{new}}{Constructor}
 #'   \item{\code{get_betas}}{Returns betas}
-#'   \item{\code{calculate_response}}{Abstract function}
-#'   \item{\code{response_is_continuous}}{Abstract function}
+#'   \item{\code{calculate_response}}{Calculates the response}
+#'   \item{\code{response_is_continuous}}{Returns TRUE}
 #'   }
 LinearNormalResponseCalculator <- R6::R6Class("LinearNormalResponseCalculator",
   public = list(

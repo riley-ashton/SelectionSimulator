@@ -12,14 +12,14 @@
 #'   \item{\code{response_is_continuous()}}{Returns whether the response is continuous}
 #'   }
 FromModelResponseCalculator <- R6::R6Class("FromModelResponseCalculator",
+  inherit = ResponseCalculator,
   public = list(
-    response_is_continuous = NULL,
-
     initialize = function(object_model,
                           irreducible_error_generator,
                           response_is_continuous) {
       private$object_model <- object_model
       private$irreducible_error_generator <- irreducible_error_generator
+      private$response_type <- response_is_continuous
     },
 
     get_betas = function() {
@@ -30,10 +30,16 @@ FromModelResponseCalculator <- R6::R6Class("FromModelResponseCalculator",
       stopifnot(class(predictors) == "data.frame")
       out <- predict(private$object_model, predictors)
       sapply(out, function(x) x + private$irreducible_error_generator())
+    },
+
+    response_is_continuous = function() {
+      private$response_type
     }
+
   ),
   private = list(
     object_model = NULL,
-    irreducible_error_generator = NULL
+    irreducible_error_generator = NULL,
+    response_type = NULL
   )
 )
