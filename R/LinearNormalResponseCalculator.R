@@ -5,33 +5,33 @@
 #' @return Object of \code{\link{R6Class}}
 #' @format \code{\link{R6Class}} object
 #' @field sigma_err Private.
-#' @field betas Private.
+#' @field coefficients Private.
 #' @section Methods:
 #' \describe{
 #'   \item{\code{new}}{Constructor}
-#'   \item{\code{get_betas}}{Returns betas}
+#'   \item{\code{get_coefficients}}{Returns coefficients}
 #'   \item{\code{calculate_response}}{Calculates the response}
 #'   \item{\code{response_is_continuous}}{Returns TRUE}
 #'   }
 LinearNormalResponseCalculator <- R6::R6Class("LinearNormalResponseCalculator",
+  inherit = ResponseCalculator,
   public = list(
-    initialize = function(num_observations, num_predictors,
-                          norm_rand_var_sd, covariance_matrix,
-                          intercept) {
-      private$num_observations <- num_observations
-      private$num_predictors <- num_predictors
+    initialize = function(norm_rand_var_sd, coefficients, intercept) {
       private$norm_rand_var_sd <- norm_rand_var_sd
-      private$covariance_matrix <- covariance_matrix
       private$intercept <- intercept
+      private$coefficients <- coefficients
     },
 
-    get_betas = function() {
-      c(`(Intercept)` = private$intercept, private$betas)
+    get_coefficients = function() {
+      c(`(Intercept)` = private$intercept, private$coefficients)
     },
 
-    calculate_response = function() {
-      as.vector(self$X %*% self$betas) +
-        self$beta_0 + rnorm(self$n, sd = self$sigma_err)
+    calculate_response = function(predictors) {
+      predictors <- as.matrix(predictors)
+      out <- as.vector(predictors %*% private$coefficients) +
+        private$intercept +
+        rnorm(nrow(predictors), sd = private$norm_rand_var_sd)
+      as.vector(out)
     },
 
     response_is_continuous = function() {
@@ -39,8 +39,7 @@ LinearNormalResponseCalculator <- R6::R6Class("LinearNormalResponseCalculator",
     }
   ),
   private = list(
-    sigma_err = NULL,
-    betas = NULL,
+    coefficients = NULL,
     norm_rand_var_sd = NULL,
     intercept = NULL
   )

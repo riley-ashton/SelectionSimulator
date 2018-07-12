@@ -19,14 +19,14 @@ Class for calculating linear response with normal error
 \describe{
 \item{\code{sigma_err}}{Private.}
 
-\item{\code{betas}}{Private.}
+\item{\code{coefficients}}{Private.}
 }}
 
 \section{Methods}{
 
 \describe{
   \item{\code{new}}{Constructor}
-  \item{\code{get_betas}}{Returns betas}
+  \item{\code{get_coefficients}}{Returns coefficients}
   \item{\code{calculate_response}}{Calculates the response}
   \item{\code{response_is_continuous}}{Returns TRUE}
   }
