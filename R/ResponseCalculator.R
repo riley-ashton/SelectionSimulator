@@ -17,7 +17,7 @@ ResponseCalculator <- R6::R6Class("ResponseCalculator",
      stop("Abstract Class!")
    },
 
-   get_betas = function() {
+   get_coefficients = function() {
      stop("Abstract function!")
    },
 

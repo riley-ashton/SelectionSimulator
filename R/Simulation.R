@@ -12,8 +12,10 @@ Simulation <- R6::R6Class("Simulation",
     },
 
     simulate = function() {
+      private$continuous_response <- self$SimulationDataGenerator$
+        ResponseCalculator$response_is_continuous()
+
       private$preallocate_lists()
-      continuous_response <- self$SimulationDataGenerator$ResponseCalculator$response_is_continuous()
 
       for(i in seq.int(private$num_simulations)) {
         private$generate_sim_data()
@@ -22,7 +24,7 @@ Simulation <- R6::R6Class("Simulation",
         private$add_fitted_coefficients_at_index(i)
         private$add_inclusion_order_at_index(i)
 
-        if(continuous_response) {
+        if(private$continuous_response) {
           private$add_test_mse_at_index(i)
           private$add_training_mse_at_index(i)
         } else {
@@ -30,6 +32,8 @@ Simulation <- R6::R6Class("Simulation",
           private$add_training_classification_rate_at_index(i)
         }
       }
+
+      private$organize_fitted_coefficients()
     },
 
     get_inclusion_orders = function() {
@@ -69,23 +73,55 @@ Simulation <- R6::R6Class("Simulation",
     training_classification_rate = NULL,
     sim_data = NULL,
     stepwise_objects = NULL,
+    continuous_response = NULL,
+    response_name = NULL,
 
     preallocate_lists = function() {
       num_columns <- length(private$stepwise_constructors)
       num_rows <- private$num_simulations
       stepwise_names <- names(private$stepwise_constructors)
 
-      private$inclusion_orders <- replicate(num_columns, vector(mode = "list", length = num_rows))
+      private$inclusion_orders <- replicate(num_columns,
+                                            vector(mode = "list", length = num_rows))
       colnames(private$inclusion_orders) <- stepwise_names
 
-      private$fitted_coefficients <- replicate(num_columns, vector(mode = "list", length = num_rows))
+      private$fitted_coefficients <- replicate(num_columns,
+                                        vector(mode = "list", length = num_rows))
       colnames(private$fitted_coefficients) <- stepwise_names
 
-      private$test_mse <- replicate(num_columns, vector(mode = "numeric", length = num_rows))
+      if(private$continuous_response) {
+        private$allocate_continuous_response_lists()
+      } else {
+        private$allocate_discrete_response_lists()
+      }
+    },
+
+    allocate_continuous_response_lists = function() {
+      num_columns <- length(private$stepwise_constructors)
+      num_rows <- private$num_simulations
+      stepwise_names <- names(private$stepwise_constructors)
+
+      private$test_mse <- replicate(num_columns,
+                                    vector(mode = "numeric", length = num_rows))
       colnames(private$test_mse) <- stepwise_names
 
-      private$training_mse <- replicate(num_columns, vector(mode = "numeric", length = num_rows))
+      private$training_mse <- replicate(num_columns,
+                                        vector(mode = "numeric", length = num_rows))
       colnames(private$training_mse) <- stepwise_names
+    },
+
+    allocate_discrete_response_lists = function() {
+      num_columns <- length(private$stepwise_constructors)
+      num_rows <- private$num_simulations
+      stepwise_names <- names(private$stepwise_constructors)
+
+      private$test_classification_rate <- replicate(num_columns,
+                                                    vector(mode = "numeric", length = num_rows))
+      colnames(private$test_classification_rate) <- stepwise_names
+
+      private$training_classification_rate <- replicate(num_columns,
+                                                        vector(mode = "numeric", length = num_rows))
+      colnames(private$training_classification_rate) <- stepwise_names
     },
 
     generate_sim_data = function() {
@@ -93,12 +129,13 @@ Simulation <- R6::R6Class("Simulation",
     },
 
     construct_stepwise_objects = function() {
-      response_name <- self$SimulationDataGenerator$get_response_name()
-      starting_formula <- as.formula(paste0(response_name, "~ 1"))
+      private$response_name <- self$SimulationDataGenerator$get_response_name()
+      starting_formula <- as.formula(paste0(private$response_name, "~ 1"))
 
       k <- log(self$SimulationDataGenerator$PredictorsGenerator$get_num_observations())
       private$stepwise_objects <- lapply(private$stepwise_constructors, function(new) {
-        new(data = private$sim_data, response_variable = response_name, starting_formula, "forward", k)
+        new(data = private$sim_data, response_variable = private$response_name,
+            starting_formula, "forward", k)
       })
     },
 
@@ -124,20 +161,80 @@ Simulation <- R6::R6Class("Simulation",
       }
     },
 
-    add_test_mse_at_index = function(i) {
+    add_training_mse_at_index = function(i) {
+      predictor_names <- setdiff(colnames(private$sim_data), private$response_name)
+      predictors <- private$sim_data[,predictor_names]
+      response <- private$sim_data[private$response_name]
 
+      stepwise_indices <- seq_along(private$stepwise_objects)
+
+      for(j in stepwise_indices) {
+        fitted_model <- private$stepwise_objects[[j]]$get_fitted_model()
+
+        predicted_response <- predict(fitted_model, predictors)
+        private$training_mse[[i,j]] <- sum((predicted_response - response) ^ 2)
+      }
     },
 
-    add_training_mse_at_index = function(i) {
+    add_test_mse_at_index = function(i) {
+      stepwise_indices <- seq_along(private$stepwise_objects)
 
+      predictor_names <- setdiff(colnames(private$sim_data), private$response_name)
+      test_data <- self$SimulationDataGenerator$simulate_data()
+      predictors <- test_data[,predictor_names]
+      response <- test_data[private$response_name]
+
+      for(j in stepwise_indices) {
+        fitted_model <- private$stepwise_objects[[j]]$get_fitted_model()
+
+        predicted_response <- predict(fitted_model, predictors)
+        private$test_mse[[i,j]] <- sum((predicted_response - response) ^ 2)
+      }
     },
 
     add_test_classification_rate_at_index = function(i) {
-
+      stop("Not yet implemented")
     },
 
     add_training_classification_rate_at_index = function(i) {
+      stop("Not yet implemented")
+    },
 
+    # Takes the unorganized list<list<vector<double>>> from fitted_coefficients
+    # and organizes the fitted coefficients into a 3D array
+    organize_fitted_coefficients = function() {
+
+      # Get and sort coefficient names
+      coefficient_names <- unique(names(unlist(private$fitted_coefficients)))
+      coefficient_names <- gtools::mixedsort(coefficient_names)
+
+      # If present put (Intercept) at the beginning
+      if("(Intercept)" %in% coefficient_names) {
+        index <- match("(Intercept)", coefficient_names)
+        coefficient_names <- c("(Intercept)", coefficient_names[-index])
+      }
+
+      # Allocate array
+      nrows <- private$num_simulations
+      ncols <- length(coefficient_names)
+      ndepth <- length(private$stepwise_objects)
+
+
+      organized_coefficients <- array(dim = c(nrows, ncols, ndepth))
+      colnames(organized_coefficients) <- coefficient_names
+      dimnames(organized_coefficients)[[3]] <- names(private$stepwise_objects)
+
+      # Sort coefficients into correct location
+      for(depth in seq.int(ndepth)) {
+        for(row in seq.int(nrows)) {
+          for(name in coefficient_names) {
+            coefficient <- private$fitted_coefficients[[row, depth]][[name]]
+            organized_coefficients[[row, name, depth]] <- unname(coefficient)
+          }
+        }
+      }
+      private$fitted_coefficients <- organized_coefficients
     }
+
   )
 )
