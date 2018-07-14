@@ -14,10 +14,9 @@ Simulation <- R6::R6Class("Simulation",
     simulate = function() {
       private$continuous_response <- self$SimulationDataGenerator$
         ResponseCalculator$response_is_continuous()
-
       private$preallocate_lists()
 
-      for(i in seq.int(private$num_simulations)) {
+      for(i in 1:private$num_simulations) {
         private$generate_sim_data()
         private$construct_stepwise_objects()
         private$call_run_on_stepwise_objects()
@@ -34,6 +33,10 @@ Simulation <- R6::R6Class("Simulation",
       }
 
       private$organize_fitted_coefficients()
+
+      private$sim_data = NULL
+      private$stepwise_objects = NULL
+      private$stepwise_constructors = NULL
     },
 
     get_inclusion_orders = function() {
@@ -132,10 +135,10 @@ Simulation <- R6::R6Class("Simulation",
       private$response_name <- self$SimulationDataGenerator$get_response_name()
       starting_formula <- as.formula(paste0(private$response_name, "~ 1"))
 
-      k <- log(self$SimulationDataGenerator$PredictorsGenerator$get_num_observations())
       private$stepwise_objects <- lapply(private$stepwise_constructors, function(new) {
         new(data = private$sim_data, response_variable = private$response_name,
-            starting_formula, "forward", k)
+            starting_formula, "forward",
+            k = log(self$SimulationDataGenerator$PredictorsGenerator$get_num_observations()))
       })
     },
 
@@ -228,7 +231,8 @@ Simulation <- R6::R6Class("Simulation",
       for(depth in seq.int(ndepth)) {
         for(row in seq.int(nrows)) {
           for(name in coefficient_names) {
-            coefficient <- private$fitted_coefficients[[row, depth]][[name]]
+            coefficient <- tryCatch(private$fitted_coefficients[[row, depth]][[name]],
+                                    error = function(e) NA)
             organized_coefficients[[row, name, depth]] <- unname(coefficient)
           }
         }

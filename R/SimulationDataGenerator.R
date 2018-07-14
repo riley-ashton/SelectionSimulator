@@ -13,7 +13,7 @@
 #'   \item{\code{get_response_name}}{Returns "response"}
 #'   }
 
-SimulationDataGenerator <- R6Class("SimulationDataGenerator",
+SimulationDataGenerator <- R6::R6Class("SimulationDataGenerator",
   public = list(
     PredictorsGenerator = NULL,
     ResponseCalculator = NULL,

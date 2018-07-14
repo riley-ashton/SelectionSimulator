@@ -4,11 +4,20 @@ Title: What the Package Does (Title Case)
 Version: 0.1.0
 Author: Riley Ashton
 Maintainer: Riley Ashton <rileyashton@me.com>
-Description: Generating simulations for testing stepwise algorithms
-License: What license is it under?
+Description: Generating simulations for testing stepwise algorithms.
+    Includes Stepwise algorithms that take correlation structure into account.
+License: MPL
 Encoding: UTF-8
 LazyData: true
 Imports:
-    R6
+    R6,
+    dplyr,
+    ggplot2,
+    tibble,
+    tidyr,
+    knitr,
+    gtools,
+    gridExtra,
+    DT
 RoxygenNote: 6.0.1
 Suggests: testthat

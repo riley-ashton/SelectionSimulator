@@ -1,8 +1,4 @@
-library(R6)
-###############
-# Step 2 Class
-###############
-Step2 <- R6Class("Step2",
+Step2 <- R6::R6Class("Step2",
  public = list(
    data = NULL,
    response_variable = NULL,

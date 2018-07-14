@@ -1,8 +1,4 @@
-library(R6)
-###############
-# Step 3 Class
-###############
-Step3 <- R6Class("Step3",
+Step3 <- R6::R6Class("Step3",
    inherit = Step2,
    public = list(
 

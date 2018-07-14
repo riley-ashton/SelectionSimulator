@@ -18,12 +18,11 @@ V1 <- 10 * runif(1000)
 V2 <- 10 * runif(1000)
 z <- 2 * V1 + 7 * V2 + 15
 t1 <- data.frame(V1, V2, z)
-mod_obj1 <- glm(z ~ V1 + V2, data = t1)
-err_gen_1 <- function(x) rnorm(n = 1, sd = 2)
 
-response_object <- FromModelResponseCalculator$new(object_model = mod_obj1,
-                                        irreducible_error_generator = err_gen_1,
-                                        response_is_continuous = TRUE)
+
+response_object <- LinearNormalResponseCalculator$new(norm_rand_var_sd = 2,
+                                                      coefficients = c(V1 = 2, V2 = 7),
+                                                      intercept = 15)
 
 #######
 # Tests
