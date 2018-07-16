@@ -1,7 +1,7 @@
-library(dplyr)
-library(ggplot2)
-# ` @importFrom dplyr %>%
-
+#' Function for plotting fitted betas as a heat map
+#' @param Simulator Simulator object
+#' @param hide_intercept Whether to inlcude the intercept in the heat map
+#' @export
 betas_heat_map = function(Simulator, hide_intercept = TRUE) {
   coefficients <- Simulator$get_fitted_coefficients()
   n <- dim(coefficients)[[3]]
@@ -12,9 +12,17 @@ betas_heat_map = function(Simulator, hide_intercept = TRUE) {
   do.call(gridExtra::grid.arrange,plots)
 }
 
-# ` @importFrom dplyr %>%
-
+#' Helper function for betas_heat_map
+#' @param matrix_slice fitted coefficient values from a single stepwise algorithm
+#' @param hide_intercept passthrough parameter
+#' @return a ggplot of a beta heat map from a single stepwise algorithm
+#' @import ggplot2
+#' @import dplyr
+#' @import tibble
+#' @importFrom tidyr gather
 betas_heat_map_helper = function(matrix_slice, hide_intercept) {
+  key <- rowid <- value <- NULL # Fixes  no visible binding for global variable CMD Check error
+
   x <- tibble::as.tibble(matrix_slice) %>%
     tibble::rowid_to_column() %>%
     tidyr::gather(key, value, -rowid)

@@ -1,5 +1,5 @@
 #' Class for calculating linear response with normal error
-#'
+#' @export
 #' @docType class
 #' @importFrom R6 R6Class
 #' @return Object of \code{\link{R6Class}}

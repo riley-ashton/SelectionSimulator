@@ -1,5 +1,5 @@
 #' Abstract Class for generating predictors
-#'
+#' @export
 #' @docType class
 #' @importFrom R6 R6Class
 #' @return Object of \code{\link{R6Class}}

@@ -1,3 +1,16 @@
+#' Wrapper class for basic Stepwise regression
+#' @export
+#' @docType class
+#' @importFrom R6 R6Class
+#' @return Object of \code{\link{R6Class}}
+#' @format \code{\link{R6Class}} object
+#' @section Methods:
+#' \describe{
+#'   \item{\code{new}}{Constructor}
+#'   \item{\code{run}}{Runs the stepwise regression and saves the fitted model and the order the covariates were included}
+#'   \item{\code{get_fitted_model}}{Returns the glm or lm object (must call "run()" first)}
+#'   \item{\code{get_inclusion_order}}{Returns the order covariates were included in (list<vector<string>>) (must call "run()" first)}
+#'   }
 StepLmWrapper <- R6::R6Class("StepLmWrapper",
   public = list(
     initialize = function(data, response_variable,

@@ -1,3 +1,23 @@
+#' Class for Simulating stepwise
+#' @export
+#' @docType class
+#' @importFrom R6 R6Class
+#' @return Object of \code{\link{R6Class}}
+#' @format \code{\link{R6Class}} object
+#' @field SimulationDataGenerator R6 object for simulating data
+#' @field ResponseCalculator object for computing response
+#' @section Methods:
+#' \describe{
+#'   \item{\code{new}}{Constructor}
+#'   \item{\code{simulate}}{Runs stepwise algorithms}
+#'   \item{\code{get_inclusion_orders}}{Returns the order of inclusions}
+#'   \item{\code{get_fitted_coefficients}}{Returns the fitted coefficients}
+#'   \item{\code{get_test_mse}}{Returns the mse on a new test set}
+#'   \item{\code{get_training_mse}}{Returns the mse on the training set}
+#'   \item{\code{get_test_classification_rate}}{Returns the classification rate on a new test set}
+#'   \item{\code{get_training_classification_rate}}{Returns the classification rate on the training set}
+#'   }
+
 Simulation <- R6::R6Class("Simulation",
   public = list (
     SimulationDataGenerator = NULL,
