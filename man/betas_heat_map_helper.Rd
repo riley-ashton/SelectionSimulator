@@ -4,7 +4,7 @@
 \alias{betas_heat_map_helper}
 \title{Helper function for betas_heat_map}
 \usage{
-betas_heat_map_helper(matrix_slice, hide_intercept)
+betas_heat_map_helper(matrix_slice, algo_name, hide_intercept)
 }
 \arguments{
 \item{matrix_slice}{fitted coefficient values from a single stepwise algorithm}

@@ -5,9 +5,11 @@
 betas_heat_map = function(Simulator, hide_intercept = TRUE) {
   coefficients <- Simulator$get_fitted_coefficients()
   n <- dim(coefficients)[[3]]
-  plots = vector(mode = "list", length = n)
+  plots <- vector(mode = "list", length = n)
+  algo_names <- colnames(Simulator$get_inclusion_orders())
   for(i in seq.int(n)) {
-    plots[[i]] <- betas_heat_map_helper(coefficients[,,i], hide_intercept)
+    plots[[i]] <- betas_heat_map_helper(coefficients[,,i],
+                                        algo_names[[i]], hide_intercept)
   }
   do.call(gridExtra::grid.arrange,plots)
 }
@@ -20,7 +22,7 @@ betas_heat_map = function(Simulator, hide_intercept = TRUE) {
 #' @import dplyr
 #' @import tibble
 #' @importFrom tidyr gather
-betas_heat_map_helper = function(matrix_slice, hide_intercept) {
+betas_heat_map_helper = function(matrix_slice, algo_name, hide_intercept) {
   key <- rowid <- value <- NULL # Fixes  no visible binding for global variable CMD Check error
 
   x <- tibble::as.tibble(matrix_slice) %>%
@@ -34,11 +36,13 @@ betas_heat_map_helper = function(matrix_slice, hide_intercept) {
   x$value <- sapply(x$value, function(x) ifelse(x==0, NA, x))
 
   x %>%
-    ggplot2::ggplot(ggplot2::aes(key, rowid, fill=value)) +
-    ggplot2::geom_raster() +
-    ggplot2::xlim(gtools::mixedsort(unique(x$key))) +
-    ggplot2::scale_fill_gradient2(low="red", high="blue", mid = "white",
+    ggplot(ggplot2::aes(key, rowid, fill=value)) +
+    geom_raster() +
+    xlim(gtools::mixedsort(unique(x$key))) +
+    scale_fill_gradient2(low="red", high="blue", mid = "white",
                          midpoint = 1, na.value = "black") +
-    ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 0)) +
-    ggplot2::labs(title = "TODO")
+    theme(axis.text.x = element_text(angle = 90, hjust = 0)) +
+    labs(title = algo_name) +
+    xlab("Model Coefficients") +
+    ylab("Simulation Number")
 }

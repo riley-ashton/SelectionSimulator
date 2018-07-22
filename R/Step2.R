@@ -17,6 +17,7 @@
 Step2 <- R6::R6Class("Step2",
  public = list(
    data = NULL,
+   num_observations = NULL,
    response_variable = NULL,
    k = NULL,
    covariate_names = NULL,
@@ -37,6 +38,7 @@ Step2 <- R6::R6Class("Step2",
                          starting_formula, stepwise_direction,
                          k, print_trace = FALSE, cor_cutoff = -0.5) {
      self$data <- data
+     self$num_observations <- dim(data)[[1]]
      self$response_variable <- response_variable
      self$current_formula <- starting_formula
      self$stepwise_direction <- stepwise_direction
@@ -83,7 +85,7 @@ Step2 <- R6::R6Class("Step2",
        if(! is.null(self$past_formulas[[as.character(min_formula)[3]]])) {
          stop("Cycle Present")
        }
-       else if(min_info_crit < self$current_info_crit) {
+       else if(min_info_crit <= self$current_info_crit) {
          self$append_to_inclusion_order(min_formula)
 
          self$past_formulas[[as.character(self$current_formula)[3]]] <- 1
@@ -93,9 +95,6 @@ Step2 <- R6::R6Class("Step2",
        else if(min_info_crit > self$current_info_crit) {
          self$fitted_model <- lm(self$current_formula, self$data)
          return()
-       }
-       else if(min_info_crit == self$current_info_crit) {
-         stop("Identical Information Criterions")
        }
      }
    },
@@ -142,8 +141,16 @@ Step2 <- R6::R6Class("Step2",
 
    compute_next_formulas = function() {
      self$predictor_strings <- list()
+
      self$current_predictors <- strsplit(as.character(self$current_formula)[3],
                                          "+", fixed = TRUE)
+
+     # Prevent fitting p = n
+     if(length(self$current_predictors) + 1 == self$num_observations) {
+       self$next_formulas = NULL
+       return()
+     }
+
      self$current_predictors <- sapply(self$current_predictors, trimws)
      if(self$stepwise_direction == "forward" | self$stepwise_direction == "both") {
        self$add_singles()

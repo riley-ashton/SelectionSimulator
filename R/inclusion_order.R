@@ -9,24 +9,38 @@
 inclusion_order <- function(Simulation, pdf_head = 15) {
   key <- . <- value <- NULL # Fixes  no visible binding for global variable CMD Check error
 
-  x <- tibble::as.tibble(Simulation$get_inclusion_orders()) %>%
-    tidyr::gather()
+  x <- tibble::as.tibble(Simulation$get_inclusion_orders())
 
-  x$value <- sapply(x$value, function(z) {
-    Reduce(function(x, y) paste(x,y, sep = ", "), z)
-  })
+  algo_names <- colnames(x)
+  title <- paste0(
+    paste0("Inclusion Order for ", Reduce(function(x, y) paste(x, y, sep = ", "), algo_names),
+           " Respectively"))
 
-  x <- x %>%
-    dplyr::group_by(value, key) %>%
-    dplyr::count(.) %>%
-    dplyr::arrange(desc(n))
-
-  if(knitr::is_html_output()) {
-    table_out <- DT::datatable(x)
-  } else {
-    table_out <- x %>%
-      utils::head(pdf_head) %>%
-      knitr::kable(.)
+  for(y in algo_names){
+    x[[y]] <- sapply(x[[y]], function(z) {
+      if(length(z) == 0) {
+        init <- ""
+      } else {
+        init <- Reduce(function(x, y) paste(x,y, sep = " | "), z)
+      }
+      tail <- " ||"
+      paste0(init, tail)
+    })
   }
-  return(table_out)
+
+  out <- vector(mode = "list", length = length(algo_names))
+
+
+  for(i in seq_along(algo_names)) {
+    y <- algo_names[[i]]
+    temp <- as.tibble(x[[y]]) %>%
+      group_by_all(.) %>%
+      count %>%
+      arrange(desc(n)) %>%
+      head(6)
+    colnames(temp) <- c(paste0("Order ", y), paste0("# " , y))
+
+    out[[i]] <- temp
+  }
+  knitr::kable(out, align='c', caption = title)
 }

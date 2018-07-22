@@ -180,6 +180,9 @@ Simulation <- R6::R6Class("Simulation",
       stepwise_indices <- seq_along(private$stepwise_objects)
       for(j in stepwise_indices) {
         inclusion_order <- private$stepwise_objects[[j]]$get_inclusion_order()
+        if(length(inclusion_order) == 0){
+          inclusion_order <- "" #avoid appending empty list or NULL
+        }
         private$inclusion_orders[[i, j]] <- inclusion_order
       }
     },
