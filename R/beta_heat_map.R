@@ -3,13 +3,14 @@
 #' @param hide_intercept Whether to inlcude the intercept in the heat map
 #' @export
 betas_heat_map = function(Simulator, hide_intercept = TRUE) {
-  coefficients <- Simulator$get_fitted_coefficients()
+  coefficients <- Simulator$get_fitted_coefficients()[1:100,,]
   n <- dim(coefficients)[[3]]
   plots <- vector(mode = "list", length = n)
   algo_names <- colnames(Simulator$get_inclusion_orders())
   for(i in seq.int(n)) {
     plots[[i]] <- betas_heat_map_helper(coefficients[,,i],
-                                        algo_names[[i]], hide_intercept)
+                                        paste0("First 100 ", algo_names[[i]]),
+                                        hide_intercept)
   }
   do.call(gridExtra::grid.arrange,plots)
 }

@@ -38,6 +38,8 @@ Simulation <- R6::R6Class("Simulation",
 
       for(i in 1:private$num_simulations) {
         private$generate_sim_data()
+        private$update_min_sample_correlation()
+        private$update_max_sample_correlation()
         private$construct_stepwise_objects()
         private$call_run_on_stepwise_objects()
         private$add_fitted_coefficients_at_index(i)
@@ -81,6 +83,14 @@ Simulation <- R6::R6Class("Simulation",
 
     get_training_classification_rate = function() {
       private$training_classification_rate
+    },
+
+    get_min_sample_correlation = function() {
+      private$min_sample_correlation
+    },
+
+    get_max_sample_correlation = function() {
+      private$max_sample_correlation
     }
   ),
 
@@ -98,6 +108,8 @@ Simulation <- R6::R6Class("Simulation",
     stepwise_objects = NULL,
     continuous_response = NULL,
     response_name = NULL,
+    min_sample_correlation = NULL,
+    max_sample_correlation = NULL,
 
     preallocate_lists = function() {
       num_columns <- length(private$stepwise_constructors)
@@ -149,6 +161,37 @@ Simulation <- R6::R6Class("Simulation",
 
     generate_sim_data = function() {
       private$sim_data <- self$SimulationDataGenerator$simulate_data()
+    },
+
+    update_min_sample_correlation = function() {
+      cor_data <- cor(private$sim_data)
+      if(is.null(private$min_sample_correlation)) {
+        private$min_sample_correlation <- cor_data
+      } else {
+        names <- row.names(cor_data)
+        data <- mapply(min, cor_data,
+                       private$min_sample_correlation, SIMPLIFY = TRUE)
+        private$min_sample_correlation <- matrix(data,
+                                                 nrow = nrow(cor_data))
+        row.names(private$min_sample_correlation) <- names
+        colnames(private$min_sample_correlation) <- names
+
+      }
+    },
+
+    update_max_sample_correlation = function() {
+      cor_data <- cor(private$sim_data)
+      if(is.null(private$max_sample_correlation)) {
+        private$max_sample_correlation <- cor_data
+      } else {
+        names <- row.names(cor_data)
+        data <- mapply(max, cor_data,
+                       private$max_sample_correlation, SIMPLIFY = TRUE)
+        private$max_sample_correlation <- matrix(data,
+                                                 nrow = nrow(cor_data))
+        row.names(private$max_sample_correlation) <- names
+        colnames(private$max_sample_correlation) <- names
+      }
     },
 
     construct_stepwise_objects = function() {
@@ -244,7 +287,6 @@ Simulation <- R6::R6Class("Simulation",
       nrows <- private$num_simulations
       ncols <- length(coefficient_names)
       ndepth <- length(private$stepwise_objects)
-
 
       organized_coefficients <- array(dim = c(nrows, ncols, ndepth))
       colnames(organized_coefficients) <- coefficient_names

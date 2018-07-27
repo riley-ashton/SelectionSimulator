@@ -91,11 +91,10 @@ training_mse_boxplot = function(Simulation) {
 test_mse_tables = function(Simulation) {
   rowid <- . <- value <- median_mse <- mean_mse <- NULL # Fixes 'no visible binding for global variable' CMD Check error
 
-  sapply(c(min_mse = min, max_mse = max, median_mse = stats::median, mean_mse = mean), function(f) {
+  sapply(c(Min = min, Max = max, Mean = mean, Median = stats::median), function(f) {
     apply(Simulation$get_test_mse(), 2, f)
-  }) %>% as_tibble(.) %>%
-    dplyr::mutate(relative_median_mse = median_mse / max(median_mse),
-           relative_mean_mse = mean_mse / max(mean_mse)) %>%
+  }) %>%
+    as.data.frame(., row.names = colnames(Simulation$get_test_mse())) %>%
     knitr::kable(., digits = 3, caption = "Test MSE")
 }
 
@@ -108,10 +107,9 @@ test_mse_tables = function(Simulation) {
 training_mse_tables = function(Simulation) {
   rowid <- . <- value <- median_mse <- mean_mse <- NULL # Fixes 'no visible binding for global variable' CMD Check error
 
-  sapply(c(min_mse = min, max_mse = max, median_mse = stats::median, mean_mse = mean), function(f) {
+  sapply(c(Min = min, Max = max, Mean = mean, Median = stats::median), function(f) {
     apply(Simulation$get_training_mse(), 2, f)
-  }) %>% tibble::as_tibble(.) %>%
-    dplyr::mutate(relative_median_mse = median_mse / max(median_mse),
-           relative_mean_mse = mean_mse / max(mean_mse)) %>%
+  }) %>%
+    as.data.frame(., row.names = colnames(Simulation$get_test_mse())) %>%
     knitr::kable(., digits = 3, caption = "Training MSE")
 }

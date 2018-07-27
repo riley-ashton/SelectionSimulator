@@ -2,6 +2,7 @@
 #' @export
 #' @docType class
 #' @importFrom R6 R6Class
+#' @import parallel
 #' @return Object of \code{\link{R6Class}}
 #' @format \code{\link{R6Class}} object
 #' @field PredictorsGenerator object for generating predictors
@@ -33,6 +34,7 @@ Step2 <- R6::R6Class("Step2",
    cor_cutoff = NULL,
    fitted_model = NULL,
    inclusion_order = NULL,
+   cpu_cores = NULL,
 
    initialize = function(data, response_variable,
                          starting_formula, stepwise_direction,
@@ -72,6 +74,7 @@ Step2 <- R6::R6Class("Step2",
 
        compute_AIC <- function(x) extractAIC(lm(x, self$data),
                                              scale = 0, k = self$k)[2]
+
        info_crit <- sapply(self$next_formulas, compute_AIC)
 
        if(self$print_trace){
