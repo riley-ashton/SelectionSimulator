@@ -34,7 +34,6 @@ Step2 <- R6::R6Class("Step2",
    cor_cutoff = NULL,
    fitted_model = NULL,
    inclusion_order = NULL,
-   cpu_cores = NULL,
 
    initialize = function(data, response_variable,
                          starting_formula, stepwise_direction,

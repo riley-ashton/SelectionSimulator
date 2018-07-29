@@ -22,6 +22,8 @@ Class for generating correlated continuous normal predictors
 \item{\code{num_observations}}{Private. The number of observations}
 
 \item{\code{num_predictors}}{Private. The number of predictors}
+
+\item{\code{predictor_names}}{Private. The names of the predictors}
 }}
 
 \section{Methods}{
