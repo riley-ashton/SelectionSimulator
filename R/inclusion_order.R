@@ -6,7 +6,7 @@
 #' @importFrom tidyr gather
 #' @importFrom DT datatable
 #' @export
-inclusion_order <- function(Simulation, pdf_head = 15) {
+inclusion_order <- function(Simulation, pdf_head = 10) {
   key <- . <- value <- NULL # Fixes  no visible binding for global variable CMD Check error
 
   x <- tibble::as.tibble(Simulation$get_inclusion_orders())
@@ -37,7 +37,7 @@ inclusion_order <- function(Simulation, pdf_head = 15) {
       group_by_all(.) %>%
       count %>%
       arrange(desc(n)) %>%
-      head(6)
+      head(pdf_head)
     colnames(temp) <- c(paste0("Order ", y), paste0("# " , y))
 
     out[[i]] <- temp

@@ -9,7 +9,8 @@ cov_mat_2 <- rbind( c(1.00, -0.80),
 predictors_object <- NormalPredictorsGenerator$new(num_observations = 10000,
                                                    num_predictors = 2,
                                                    norm_rand_var_sd = 2,
-                                                   covariance_matrix = cov_mat_2)
+                                                   covariance_matrix = cov_mat_2,
+                                                   predictor_names = c("V1", "V2"))
 
 ##############################################
 # ResponseCalculator from Linear gaussian model

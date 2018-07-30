@@ -9,12 +9,14 @@ cov_mat_5 <- rbind( c(1.00, -0.80,  0.75, 0.00, 0.00),
                     c( 0.00,  0.00,  0.00, 1.00, 0.25),
                     c( 0.00,  0.00,  0.00, 0.25, 1.00))
 
+coefficients_1 <- c(V1 = 1, V2 = 2, V3 = 3, V4 = 4, V5 = -5)
+
 predict_gen <- NormalPredictorsGenerator$new(num_observations = 1000,
                                       num_predictors = 5,
                                       norm_rand_var_sd = 2,
-                                      covariance_matrix = cov_mat_5)
+                                      covariance_matrix = cov_mat_5,
+                                      predictor_names = names(coefficients_1))
 
-coefficients_1 <- c(V1 = 1, V2 = 2, V3 = 3, V4 = 4, V5 = -5)
 
 response_calc_1 <- LinearNormalResponseCalculator$new(norm_rand_var_sd = 1,
                                                   coefficients = coefficients_1,

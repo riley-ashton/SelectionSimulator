@@ -8,7 +8,8 @@ cov_mat_5 <- rbind( c(1.00, -0.80,  0.75, 0.00, 0.00),
 obj1 <- NormalPredictorsGenerator$new(num_observations = 10000,
                                       num_predictors = 5,
                                       norm_rand_var_sd = 2,
-                                      covariance_matrix = cov_mat_5)
+                                      covariance_matrix = cov_mat_5,
+                                      predictor_names = sapply(1:5, function(i){paste0("V", i)}))
 
 test_that("getters", {
   expect_equal(obj1$get_num_predictors(), 5)

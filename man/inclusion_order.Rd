@@ -4,7 +4,7 @@
 \alias{inclusion_order}
 \title{Function for outputting inclusion order as a table}
 \usage{
-inclusion_order(Simulation, pdf_head = 15)
+inclusion_order(Simulation, pdf_head = 10)
 }
 \arguments{
 \item{Simulation}{object}

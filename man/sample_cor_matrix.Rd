@@ -2,7 +2,7 @@
 % Please edit documentation in R/sample_cor_matrix.R
 \name{sample_cor_matrix}
 \alias{sample_cor_matrix}
-\title{Function for displaying generated sample correlation matrix}
+\title{Function for displaying generated sample correlation matrix.}
 \usage{
 sample_cor_matrix(Simulator)
 }
@@ -10,5 +10,5 @@ sample_cor_matrix(Simulator)
 \item{Simulator}{Simulator object}
 }
 \description{
-Function for displaying generated sample correlation matrix
+Function for displaying generated sample correlation matrix.
 }

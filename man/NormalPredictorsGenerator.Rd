@@ -30,7 +30,8 @@ Class for generating correlated continuous normal predictors
 
 \describe{
   \item{\code{new}}{Constructor(num_observations : int,
-   num_predictors : int, covariance_matrix : matrix<double>)}
+   num_predictors : int, covariance_matrix : matrix<double>,
+   predictor_names : vector<string>}
   \item{\code{get_num_observations}}{Returns num_observations}
   \item{\code{get_num_predictors}}{Returns num_predictors}
   \item{\code{simulate_predictors}}{Returns matrix of predictors}

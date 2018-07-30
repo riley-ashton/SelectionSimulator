@@ -1,4 +1,4 @@
-#' Function for displaying generated sample correlation matrix
+#' Function for displaying generated sample correlation matrix.
 #' @param Simulator Simulator object
 #' @export
 sample_cor_matrix  <- function(Simulator) {
@@ -16,6 +16,6 @@ sample_cor_matrix  <- function(Simulator) {
   }, min_cors, max_cors)
   out <- matrix(data = out, nrow = sqrt(length(out)))
   diag(out) <- "     X   "
-  out <- apply(mat, MARGIN = 2, function(x) Reduce(purrr::partial(paste, sep = " & "), x))
+  out <- apply(out, MARGIN = 2, function(x) Reduce(purrr::partial(paste, sep = " & "), x))
   Reduce(purrr::partial(paste, sep = " \\ "), out)
 }
