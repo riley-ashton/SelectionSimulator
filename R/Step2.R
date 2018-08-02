@@ -34,19 +34,23 @@ Step2 <- R6::R6Class("Step2",
    cor_cutoff = NULL,
    fitted_model = NULL,
    inclusion_order = NULL,
+   glm_family = NULL,
 
-   initialize = function(data, response_variable,
-                         starting_formula, stepwise_direction,
-                         k, print_trace = FALSE, cor_cutoff = -0.5) {
+   initialize = function(data, response_variable, starting_formula,
+                         stepwise_direction, k, glm_family = gaussian,
+                         print_trace = FALSE, cor_cutoff = -0.5) {
      self$data <- data
      self$num_observations <- dim(data)[[1]]
+     self$glm_family <- glm_family
      self$response_variable <- response_variable
      self$current_formula <- starting_formula
      self$stepwise_direction <- stepwise_direction
      self$k <- k
      self$print_trace <- print_trace
      self$cor_cutoff <- cor_cutoff
-     self$current_info_crit <- extractAIC(lm(self$current_formula, self$data),
+     self$current_info_crit <- extractAIC(glm(self$current_formula,
+                                              family = self$glm_family,
+                                              data = self$data),
                                           scale = 0, k = self$k)[2]
      self$covariate_names <- setdiff(names(self$data), self$response_variable)
      self$compute_predictor_blocks()
@@ -67,11 +71,13 @@ Step2 <- R6::R6Class("Step2",
 
        # Fitted full (forwards) or empty (backwards) model
        if(length(self$next_formulas) == 0) {
-         self$fitted_model <- lm(self$current_formula, self$data)
+         self$fitted_model <- glm(self$current_formula, family = self$glm_family,
+                                  data = self$data)
          return()
        }
 
-       compute_AIC <- function(x) extractAIC(lm(x, self$data),
+       compute_AIC <- function(x) extractAIC(glm(x, family = self$glm_family,
+                                                 data =  self$data),
                                              scale = 0, k = self$k)[2]
 
        info_crit <- sapply(self$next_formulas, compute_AIC)
@@ -95,7 +101,8 @@ Step2 <- R6::R6Class("Step2",
          self$current_formula <- min_formula
        }
        else if(min_info_crit > self$current_info_crit) {
-         self$fitted_model <- lm(self$current_formula, self$data)
+         self$fitted_model <- glm(self$current_formula, family = self$glm_family,
+                                  data = self$data)
          return()
        }
      }

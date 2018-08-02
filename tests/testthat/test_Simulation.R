@@ -27,9 +27,9 @@ test_obj_1 <- Simulation$new(sim_data_gen, c(Step = StepLmWrapper$new, Step2 = S
 test_obj_1$simulate()
 
 
-# Changes if algorithm changes.
+# Changes if Step3 algorithm changes.
 # Checks that Step3 is including V1V2V3 together at least once
-test_that("inclusion_order_dependson_Step3", {
+test_that("triples_in_inclusion_order", {
   inclusion_orders_Step3 <- test_obj_1$get_inclusion_orders()[,"Step3"]
   triple_inclusions <- sapply(inclusion_orders_Step3, function(x) "V1V2V3" %in% x)
   expect_true(any(triple_inclusions))
@@ -43,4 +43,32 @@ test_that("fitted_coefficients", {
   expect_equal(mean(X["V3",]), 3, tolerance = 0.5)
   expect_equal(mean(X["V4",]), 4, tolerance = 0.5)
   expect_equal(mean(X["V5",]), -5, tolerance = 0.5)
+})
+
+max_cor <- test_obj_1$get_max_sample_correlation()[1:5,1:5]
+min_cor <- test_obj_1$get_min_sample_correlation()[1:5,1:5]
+
+test_that("sample_correlation_matrices_between_neg_1_and_1", {
+  expect_true(all(max_cor <= 1))
+  expect_true(all(min_cor <= 1))
+  expect_true(all(max_cor >= -1))
+  expect_true(all(min_cor >= -1))
+})
+
+test_that("sample_correlation_matrices_diagonals_are_one", {
+  expect_true(all(diag(max_cor) == 1))
+  expect_true(all(diag(min_cor) == 1))
+})
+
+test_mse <- test_obj_1$get_test_mse()
+train_mse <- test_obj_1$get_training_mse()
+
+test_that("test_train_mse_dimensions", {
+  expect_equal(dim(test_mse), c(5,3))
+  expect_equal(dim(train_mse), c(5,3))
+})
+
+test_that("test_train_no_NA_values", {
+  expect_true(! any(is.na(test_mse)))
+  expect_true(! any(is.na(train_mse)))
 })

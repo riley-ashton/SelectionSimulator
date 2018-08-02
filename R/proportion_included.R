@@ -6,7 +6,7 @@ proportion_included <- function(Simulation) {
   coefficients <- Simulation$SimulationDataGenerator$ResponseCalculator$get_coefficients()
   predictor_names <- setdiff(names(coefficients), c("(Intercept)"))
   fitted <- Simulation$get_fitted_coefficients()
-  algo_names <-colnames(test_twoNeg$get_test_mse())
+  algo_names <-colnames(Simulation$get_test_mse())
 
   out <- sapply(algo_names, function(i) {
     sapply(predictor_names, function(y){
@@ -26,7 +26,7 @@ only_correct_predictors_included <- function(Simulation) {
   correct_predictors <- setdiff(names(coefficients[coefficients != 0]),
                                 c("(Intercept)"))
   fitted <- Simulation$get_fitted_coefficients()[,predictor_names,] #w/o Intercept
-  algo_names <-colnames(test_twoNeg$get_test_mse())
+  algo_names <-colnames(Simulation$get_test_mse())
 
   out <- sapply(algo_names, function(i) {
     sum(apply(fitted[,,i], MARGIN = 1, function(x) {
@@ -50,7 +50,7 @@ at_least_correct_predictors_included <- function(Simulation) {
   correct_predictors <- setdiff(names(coefficients[coefficients != 0]),
                                 c("(Intercept)"))
   fitted <- Simulation$get_fitted_coefficients()[,predictor_names,] #w/o Intercept
-  algo_names <-colnames(test_twoNeg$get_test_mse())
+  algo_names <-colnames(Simulation$get_test_mse())
 
   out <- sapply(algo_names, function(i) {
     sum(apply(fitted[,,i], MARGIN = 1, function(x) {

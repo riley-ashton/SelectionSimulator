@@ -45,11 +45,14 @@ Step3 <- R6::R6Class("Step3",
      max_block_size = NULL,
 
      initialize = function(data, response_variable, starting_formula,
-                           stepwise_direction, k, print_trace = FALSE,
-                           cor_cutoff = -0.5, recursive_cor_negative_cutoff = -0.5,
-                           recursive_cor_positive_cutoff = 0.5, max_block_size = 3) {
+                           stepwise_direction, k, glm_family = gaussian,
+                           print_trace = FALSE, cor_cutoff = -0.5,
+                           recursive_cor_negative_cutoff = -0.5,
+                           recursive_cor_positive_cutoff = 0.5,
+                           max_block_size = 3) {
           super$initialize(data, response_variable, starting_formula,
-                           stepwise_direction, k, print_trace, cor_cutoff)
+                           stepwise_direction, k, glm_family,
+                           print_trace, cor_cutoff)
 
           self$recursive_cor_negative_cutoff <- recursive_cor_negative_cutoff
           self$recursive_cor_positive_cutoff <- recursive_cor_positive_cutoff

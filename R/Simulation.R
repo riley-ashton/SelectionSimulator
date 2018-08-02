@@ -55,8 +55,8 @@ Simulation <- R6::R6Class("Simulation",
         } else {
           out <- list(
             sample_correlation = cor(sim_data),
-            inclusion_order = private$inclusion_order(step_objects),
-            fitted_coefficients = private$fitted_coefficients(step_objects),
+            inclusion_order = private$compute_inclusion_order(step_objects),
+            fitted_coefficients = private$compute_fitted_coefficients(step_objects),
             test_classification_rate = private$compute_test_classification_rate(sim_data, step_objects),
             traning_classification_rate = private$compute_training_classification_rate(sim_data, step_objects)
           )
@@ -73,7 +73,7 @@ Simulation <- R6::R6Class("Simulation",
         private$training_mse <-  t(sapply(results, function(obj) obj$training_mse))
       } else {
         private$test_classification_rate <-  t(sapply(results, function(obj) obj$test_classification_rate))
-        private$training_classification_rate <-  t(sapply(results, function(obj) obj$training_classification_rate))
+        private$training_classification_rate <-  t(sapply(results, function(obj) obj$traning_classification_rate))
       }
 
       # Reduce object size
@@ -116,7 +116,6 @@ Simulation <- R6::R6Class("Simulation",
   private = list(
     stepwise_constructors = NULL,
     num_simulations = NULL,
-    parallel_cores = NULL,
     inclusion_orders = NULL,
     fitted_coefficients = NULL,
     test_mse = NULL,
@@ -125,27 +124,22 @@ Simulation <- R6::R6Class("Simulation",
     training_classification_rate = NULL,
     sim_data = NULL,
     response_name = NULL,
+
+    # A matrix of the minimum values seen for sample correlations
     min_sample_correlation = NULL,
+    # A matrix of the maximum values seen for sample correlations
     max_sample_correlation = NULL,
+    # Number of CPU cores to use in a simulation
+    parallel_cores = NULL,
 
-    preallocate_lists = function() {
-      num_columns <- length(private$stepwise_constructors)
-      num_rows <- private$num_simulations
-      stepwise_names <- names(private$stepwise_constructors)
 
-      private$inclusion_orders <- replicate(num_columns,
-                                            vector(mode = "list", length = num_rows))
-      colnames(private$inclusion_orders) <- stepwise_names
-
-      private$fitted_coefficients <- replicate(num_columns,
-                                        vector(mode = "list", length = num_rows))
-      colnames(private$fitted_coefficients) <- stepwise_names
-    },
-
+    # Generates the data for a simulation
     generate_sim_data = function() {
       private$sim_data <- self$SimulationDataGenerator$simulate_data()
     },
 
+
+    # Creates the stepwise objects from the stepwise algorithms
     stepwise_objects = function(sim_data) {
       starting_formula <- as.formula(paste0(private$response_name, "~ 1"))
 
@@ -156,6 +150,8 @@ Simulation <- R6::R6Class("Simulation",
       })
     },
 
+
+    # Returns the fitted coefficients for each stepwise algorithm for a given simulation
     compute_fitted_coefficients = function(step_objects) {
       lapply(step_objects, function(obj) {
         fitted_model <- obj$get_fitted_model()
@@ -163,6 +159,7 @@ Simulation <- R6::R6Class("Simulation",
       })
     },
 
+    # Returns the inclusion order for each stepwise algorithm for a given simulation
     compute_inclusion_order = function(step_objects) {
       lapply(step_objects, function(obj) {
         inclusion_order <- obj$get_inclusion_order()
@@ -174,6 +171,7 @@ Simulation <- R6::R6Class("Simulation",
       })
     },
 
+    # Computes and returns the training mse for each stepwise algorithm for a given simulation
     compute_training_mse = function(sim_data, step_objects) {
       predictor_names <- setdiff(colnames(sim_data), private$response_name)
       predictors <- sim_data[,predictor_names]
@@ -187,6 +185,8 @@ Simulation <- R6::R6Class("Simulation",
       out
     },
 
+
+    # Computes and returns the test mse for each stepwise algorithm for a given simulation
     compute_test_mse = function(sim_data, step_objects) {
       predictor_names <- setdiff(colnames(sim_data), private$response_name)
       test_data <- self$SimulationDataGenerator$simulate_data()
@@ -201,14 +201,36 @@ Simulation <- R6::R6Class("Simulation",
       out
     },
 
-    compute_test_classification_rate = function(sim_data, step_objects) {
-      stop("Not yet implemented")
-    },
 
+    # Computes and returns the test classification rate for each stepwise algorithm for a given simulation
     compute_training_classification_rate = function(sim_data, step_objects) {
-      stop("Not yet implemented")
+      sapply(step_objects, function(obj) {
+        response_index <- match(private$response_name, colnames(sim_data))
+        fitted <- predict(obj$get_fitted_model(), sim_data[, -response_index], type='response')
+        fitted <- ifelse(fitted > 0.5, 1, 0)
+        response <- sim_data[, response_index]
+        mis_class_error <- mean(fitted != response)
+        1 - mis_class_error
+      })
     },
 
+
+    # Computes and returns the training classification rate for each stepwise algorithm for a given simulation
+    compute_test_classification_rate = function(sim_data, step_objects) {
+      sapply(step_objects, function(obj) {
+        test_data <- self$SimulationDataGenerator$simulate_data()
+        response_index <- match(private$response_name, colnames(sim_data))
+        fitted <- predict(obj$get_fitted_model(), test_data[,-response_index], type='response')
+        fitted <- ifelse(fitted > 0.5, 1, 0)
+        response <- sim_data[,response_index]
+        mis_class_error <- mean(fitted != response)
+        1 - mis_class_error
+      })
+    },
+
+
+    # Put elementwise maxes and minimums from all the sample correlation matrices,
+    #    into private$max_sample_correlation and private$min_sample_correlation respectively
     combine_sample_correlation = function(sim_data_names, results) {
       samples_cors <- lapply(results, function(obj) obj$sample_correlation)
       maxes <- Reduce(pmax, samples_cors, -1)
