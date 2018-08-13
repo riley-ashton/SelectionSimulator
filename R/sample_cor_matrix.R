@@ -16,6 +16,8 @@ sample_cor_matrix  <- function(Simulator) {
   }, min_cors, max_cors)
   out <- matrix(data = out, nrow = sqrt(length(out)))
   diag(out) <- "     X   "
+
+  # Seperate columns with latex symbol &, rows with \\
   out <- apply(out, MARGIN = 2, function(x) Reduce(purrr::partial(paste, sep = " & "), x))
   Reduce(purrr::partial(paste, sep = " \\ "), out)
 }

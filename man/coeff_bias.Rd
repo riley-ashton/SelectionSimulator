@@ -4,7 +4,7 @@
 \alias{coeff_bias}
 \title{Function for displaying fitted coefficient bias in a table}
 \usage{
-coeff_bias(Simulation)
+coeff_bias(Simulation, rounding_digits = 3)
 }
 \arguments{
 \item{Simulation}{object}

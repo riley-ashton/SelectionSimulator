@@ -4,7 +4,7 @@
 \alias{coeff_variance}
 \title{Function for displaying fitted coefficient variance in a table}
 \usage{
-coeff_variance(Simulation)
+coeff_variance(Simulation, rounding_digits = 3)
 }
 \arguments{
 \item{Simulation}{object}

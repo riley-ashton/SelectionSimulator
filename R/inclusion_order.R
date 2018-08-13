@@ -4,7 +4,6 @@
 #' @import dplyr
 #' @import tibble
 #' @importFrom tidyr gather
-#' @importFrom DT datatable
 #' @export
 inclusion_order <- function(Simulation, pdf_head = 10) {
   key <- . <- value <- NULL # Fixes  no visible binding for global variable CMD Check error
