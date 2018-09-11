@@ -29,8 +29,8 @@ Class for Simulating stepwise
   \item{\code{simulate}}{Runs stepwise algorithms}
   \item{\code{get_inclusion_orders}}{Returns the order of inclusions}
   \item{\code{get_fitted_coefficients}}{Returns the fitted coefficients}
-  \item{\code{get_test_mse}}{Returns the mse on a new test set}
-  \item{\code{get_training_mse}}{Returns the mse on the training set}
+  \item{\code{get_test_sse}}{Returns the sse on a new test set}
+  \item{\code{get_training_sse}}{Returns the sse on the training set}
   \item{\code{get_test_classification_rate}}{Returns the classification rate on a new test set}
   \item{\code{get_training_classification_rate}}{Returns the classification rate on the training set}
   }

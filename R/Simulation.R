@@ -13,8 +13,8 @@
 #'   \item{\code{simulate}}{Runs stepwise algorithms}
 #'   \item{\code{get_inclusion_orders}}{Returns the order of inclusions}
 #'   \item{\code{get_fitted_coefficients}}{Returns the fitted coefficients}
-#'   \item{\code{get_test_mse}}{Returns the mse on a new test set}
-#'   \item{\code{get_training_mse}}{Returns the mse on the training set}
+#'   \item{\code{get_test_sse}}{Returns the sse on a new test set}
+#'   \item{\code{get_training_sse}}{Returns the sse on the training set}
 #'   \item{\code{get_test_classification_rate}}{Returns the classification rate on a new test set}
 #'   \item{\code{get_training_classification_rate}}{Returns the classification rate on the training set}
 #'   }
@@ -49,8 +49,8 @@ Simulation <- R6::R6Class("Simulation",
             sample_correlation = cor(sim_data),
             inclusion_order = private$compute_inclusion_order(step_objects),
             fitted_coefficients = private$compute_fitted_coefficients(step_objects),
-            test_mse = private$compute_test_mse(sim_data, step_objects),
-            training_mse = private$compute_training_mse(sim_data, step_objects)
+            test_sse = private$compute_test_sse(sim_data, step_objects),
+            training_sse = private$compute_training_sse(sim_data, step_objects)
           )
         } else {
           out <- list(
@@ -69,8 +69,8 @@ Simulation <- R6::R6Class("Simulation",
       private$inclusion_orders <- t(sapply(results, function(obj) obj$inclusion_order))
 
       if(continuous_response) {
-        private$test_mse <-  t(sapply(results, function(obj) obj$test_mse))
-        private$training_mse <-  t(sapply(results, function(obj) obj$training_mse))
+        private$test_sse <-  t(sapply(results, function(obj) obj$test_sse))
+        private$training_sse <-  t(sapply(results, function(obj) obj$training_sse))
       } else {
         private$test_classification_rate <-  t(sapply(results, function(obj) obj$test_classification_rate))
         private$training_classification_rate <-  t(sapply(results, function(obj) obj$traning_classification_rate))
@@ -88,12 +88,12 @@ Simulation <- R6::R6Class("Simulation",
       private$fitted_coefficients
     },
 
-    get_test_mse = function() {
-      private$test_mse
+    get_test_sse = function() {
+      private$test_sse
     },
 
-    get_training_mse = function() {
-      private$training_mse
+    get_training_sse = function() {
+      private$training_sse
     },
 
     get_test_classification_rate = function() {
@@ -118,8 +118,8 @@ Simulation <- R6::R6Class("Simulation",
     num_simulations = NULL,
     inclusion_orders = NULL,
     fitted_coefficients = NULL,
-    test_mse = NULL,
-    training_mse = NULL,
+    test_sse = NULL,
+    training_sse = NULL,
     test_classification_rate = NULL,
     training_classification_rate = NULL,
     sim_data = NULL,
@@ -171,8 +171,8 @@ Simulation <- R6::R6Class("Simulation",
       })
     },
 
-    # Computes and returns the training mse for each stepwise algorithm for a given simulation
-    compute_training_mse = function(sim_data, step_objects) {
+    # Computes and returns the training sse for each stepwise algorithm for a given simulation
+    compute_training_sse = function(sim_data, step_objects) {
       predictor_names <- setdiff(colnames(sim_data), private$response_name)
       predictors <- sim_data[,predictor_names]
       response <- sim_data[private$response_name]
@@ -186,8 +186,8 @@ Simulation <- R6::R6Class("Simulation",
     },
 
 
-    # Computes and returns the test mse for each stepwise algorithm for a given simulation
-    compute_test_mse = function(sim_data, step_objects) {
+    # Computes and returns the test sse for each stepwise algorithm for a given simulation
+    compute_test_sse = function(sim_data, step_objects) {
       predictor_names <- setdiff(colnames(sim_data), private$response_name)
       test_data <- self$SimulationDataGenerator$simulate_data()
       predictors <- test_data[,predictor_names]

@@ -28,9 +28,10 @@ LinearNormalResponseCalculator <- R6::R6Class("LinearNormalResponseCalculator",
 
     calculate_response = function(predictors) {
       predictors <- as.matrix(predictors)
+      error_term <- rnorm(nrow(predictors), sd = private$norm_rand_var_sd)
       out <- as.vector(predictors %*% private$coefficients) +
-        private$intercept +
-        rnorm(nrow(predictors), sd = private$norm_rand_var_sd)
+        private$intercept + error_term
+
       as.vector(out)
     },
 

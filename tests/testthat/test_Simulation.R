@@ -60,15 +60,15 @@ test_that("sample_correlation_matrices_diagonals_are_one", {
   expect_true(all(diag(min_cor) == 1))
 })
 
-test_mse <- test_obj_1$get_test_mse()
-train_mse <- test_obj_1$get_training_mse()
+test_sse <- test_obj_1$get_test_sse()
+train_sse <- test_obj_1$get_training_sse()
 
-test_that("test_train_mse_dimensions", {
-  expect_equal(dim(test_mse), c(5,3))
-  expect_equal(dim(train_mse), c(5,3))
+test_that("test_train_sse_dimensions", {
+  expect_equal(dim(test_sse), c(5,3))
+  expect_equal(dim(train_sse), c(5,3))
 })
 
 test_that("test_train_no_NA_values", {
-  expect_true(! any(is.na(test_mse)))
-  expect_true(! any(is.na(train_mse)))
+  expect_true(! any(is.na(test_sse)))
+  expect_true(! any(is.na(train_sse)))
 })

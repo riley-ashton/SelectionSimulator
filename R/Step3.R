@@ -64,6 +64,7 @@ Step3 <- R6::R6Class("Step3",
      },
 
      generate_block_present_table = function() {
+       # Create hashtable
        table_size <- 5 * length(self$predictor_blocks)
        self$block_present_table <- new.env(hash = TRUE, size = table_size)
 
@@ -72,6 +73,16 @@ Step3 <- R6::R6Class("Step3",
        }
      },
 
+     # Generates list of vectors, indexed by variable name "X", which contain a
+     # vector of variables that surpass the correlation threshold with respect
+     # to "X"
+     #
+     # Example
+     # index  vector
+     # "V1"   c("V2", "V4")
+     # "V2"   c("V1", "V4")
+     # "V3"   c()
+     # "V4"   c("V1", "V2")
      generate_cor_list = function() {
        covariate_data <- self$data[self$covariate_names]
        covariate_correlation <- cor(covariate_data)
